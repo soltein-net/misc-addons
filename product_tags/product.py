@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 #
 #    OpenERP, Open Source Management Solution
@@ -18,41 +19,42 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #
-from openerp import api
-from openerp import fields
-from openerp import models
+from odoo import api, fields, models, _
+from odoo.exceptions import ValidationError
 
 
 class ProductTag(models.Model):
     _description = 'Product Tags'
     _name = "product.tag"
-
-    name = fields.Char('Tag Name', required=True, translate=True)
-    active = fields.Boolean(help='The active field allows you to hide the tag without removing it.', default=True)
-    parent_id = fields.Many2one(string='Parent Tag', comodel_name='product.tag', index=True, ondelete='cascade')
-    child_ids = fields.One2many(string='Child Tags', comodel_name='product.tag', inverse_name='parent_id')
-    parent_left = fields.Integer('Left Parent', index=True)
-    parent_right = fields.Integer('Right Parent', index=True)
-
-    image = fields.Binary('Image')
-
+    _order = 'parent_left, name'
     _parent_store = True
     _parent_order = 'name'
-    _order = 'parent_left'
+
+    name = fields.Char(string='Tag Name', required=True, translate=True)
+    color = fields.Integer(string='Color Index')
+    parent_id = fields.Many2one('product.tag', string='Parent Category', index=True, ondelete='cascade')
+    child_ids = fields.One2many('product.tag', 'parent_id', string='Child Tags')
+    active = fields.Boolean(default=True, help="The active field allows you to hide the tag without removing it.")
+    parent_left = fields.Integer(string='Left parent', index=True)
+    parent_right = fields.Integer(string='Right parent', index=True)
+
+    @api.constrains('parent_id')
+    def _check_parent_id(self):
+        if not self._check_recursion():
+            raise ValidationError(_('Error ! You can not create recursive tags.'))
 
     @api.multi
     def name_get(self):
         """ Return the tags' display name, including their direct parent. """
-        res = {}
-        for record in self:
-            current = record
-            name = current.name
-            while current.parent_id:
-                name = '%s / %s' % (current.parent_id.name, name)
+        res = []
+        for tag in self:
+            names = []
+            current = tag
+            while current:
+                names.append(current.name)
                 current = current.parent_id
-            res[record.id] = name
-
-        return list(res.items())
+            res.append((tag.id, ' / '.join(reversed(names))))
+        return res
 
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):
@@ -61,8 +63,7 @@ class ProductTag(models.Model):
             # Be sure name_search is symetric to name_get
             name = name.split(' / ')[-1]
             args = [('name', operator, name)] + args
-        tags = self.search(args, limit=limit)
-        return tags.name_get()
+        return self.search(args, limit=limit).name_get()
 
 
 class ProductTemplate(models.Model):
