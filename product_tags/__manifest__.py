@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 #
 #    OpenERP, Open Source Management Solution
@@ -21,7 +22,7 @@
 
 {
     "name": "Product Tags",
-    "version": "1.0",
+    "version": "11.0.1.0.0",
     "author": "Julius Network Solutions",
     "website": "http://julius.fr",
     "category": "Sales Management",
@@ -37,7 +38,7 @@
         'security/ir.model.access.csv',
         'product_view.xml',
     ],
-    'installable': False,
+    'installable': True,
+    'application': False,
+    'auto_install': False,
 }
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
