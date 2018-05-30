@@ -16,11 +16,11 @@ class Planner(models.Model):
         planner_footer = '<p>' + planner_footer + '</p>'
         planner_footer = bytes(planner_footer, 'utf-8')
 
-        res = re.sub(rb'<p>[^<]*to contact our accounting experts by using the[\s\S]*?</div>', planner_footer, res)
-        res = re.sub(rb'<p>[^<]*If you need help, do not hesitate to contact our experts[\s\S]*?</div>', planner_footer, res)
-        res = re.sub(rb'<h4>Don\'t hesitate to[\s\S]*logo.png"/>', b'', res)
-        res = re.sub(rb'<p>Once it\'s fully working[\s\S]*odoo_logo.png"/>', planner_footer, res)
-        res = re.sub(rb'<div class="mt32">[\s\S\n]*Fabien Pinckaers, Founder[\s\S\n]*?</div>', planner_footer, res)
-        res = re.sub(rb'<div[^<]*<strong>See it in action [\s\S]*?</strong><br/>[\s\S]*?<iframe[^<]*www.youtube.com/embed/204DbheXfWw[\s\S]*?</iframe>[^<]*</div>', '', res)
-        res = re.sub(rb'<img src="/web_planner/static/src/img/odoo_logo.png"/>', '', res)
+        res = re.sub(r'<p>[^<]*to contact our accounting experts by using the[\s\S]*?</div>', planner_footer, res)
+        res = re.sub(r'<p>[^<]*If you need help, do not hesitate to contact our experts[\s\S]*?</div>', planner_footer, res)
+        res = re.sub(r'<h4>Don\'t hesitate to[\s\S]*logo.png"/>', b'', res)
+        res = re.sub(r'<p>Once it\'s fully working[\s\S]*odoo_logo.png"/>', planner_footer, res)
+        res = re.sub(r'<div class="mt32">[\s\S\n]*Fabien Pinckaers, Founder[\s\S\n]*?</div>', planner_footer, res)
+        res = re.sub(r'<div[^<]*<strong>See it in action [\s\S]*?</strong><br/>[\s\S]*?<iframe[^<]*www.youtube.com/embed/204DbheXfWw[\s\S]*?</iframe>[^<]*</div>', '', res)
+        res = re.sub(r'<img src="/web_planner/static/src/img/odoo_logo.png"/>', '', res)
         return debrand_bytes(self.env, res)
